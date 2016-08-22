@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define number of events
-export NUMBEREVENTS=1000
+export NUMBEREVENTS=600000
 
 # Define workdir
-export WORKDIR=/nfs/dust/cms/user/mharrend/trancheprivateproduction/test3
+export WORKDIR=/nfs/dust/cms/user/asaibel/MCProductionScripts/privateMCproduction
 
 # Define gridpack location, warning if you are using crab, requires global accessible gridpack
 # If running locally you can also set a local gridpack location
@@ -21,7 +21,7 @@ export STARTDIR=`pwd`
 echo "Start dir was:"
 echo $STARTDIR
 
-echo "Workdir set is:" 
+echo "Workdir set is:"
 echo $WORKDIR
 mkdir -p $WORKDIR
 echo "Created workdir"
@@ -29,11 +29,20 @@ cd $WORKDIR
 echo "Changed into workdir"
 
 echo "Install CMSSW in workdir"
-source /cvmfs/cms.cern.ch/cmsset_default.sh 
+source /cvmfs/cms.cern.ch/cmsset_default.sh
 scram project CMSSW_7_1_25
 cd CMSSW_7_1_25/src
 eval `scramv1 runtime -sh`
 echo "Loaded CMSSW_7_1_25"
+
+echo "Cloning filter to CMMSW"
+
+git cms-addpkg PhysicsTools/JetMCAlgos
+git remote add Andrej-CMS git://github.com/Andrej-CMS/cmssw.git
+git fetch Andrej-CMS
+git checkout --track Andrej-CMS/ttHFGenFilter_71X
+git cms-addpkg RecoJets/Configuration
+git cms-addpkg RecoJets/JetProducers
 
 echo "Copy run script to workdir"
 mkdir -p GeneratorInterface/LHEInterface/data/
@@ -41,7 +50,7 @@ cp $STARTDIR/run_generic_tarball_cvmfs.sh GeneratorInterface/LHEInterface/data/r
 
 echo "Change number of events in python config to"
 echo $NUMBEREVENTS
-sed -e "s/#NUMBEREVENTS#/${NUMBEREVENTS}/g" $STARTDIR/pythonLHEGEN_cfg_draft.py > ./pythonLHEGEN_cfg_eventsInserted.py
+sed -e "s/#NUMBEREVENTS#/${NUMBEREVENTS}/g" $STARTDIR/pythonLHEGEN_cfg_draft_Filter.py > ./pythonLHEGEN_cfg_eventsInserted.py
 
 if [ $USECRAB = "True" ]; then
 	echo "Will use crab submission, adjust crabconfig.py accordingly if problems arise"
@@ -53,7 +62,7 @@ if [ $USECRAB = "True" ]; then
 
 	echo "Scram b and start of LHEGEN production"
 	scram b -j 4
-	
+
 	echo "Load crab environment, grid environment should be loaded manually in advance if necessary"
 	source /cvmfs/cms.cern.ch/crab3/crab.sh
 

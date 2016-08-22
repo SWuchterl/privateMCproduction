@@ -1,7 +1,7 @@
 # Auto generated configuration file
-# using:
-# Revision: 1.19
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
+# using: 
+# Revision: 1.19 
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
 # with command line options: Configuration/GenProduction/python/pythonLHEGEN.py --fileout file:eventLHEGEN-output.root --mc --eventcontent RAWSIM,LHE --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step LHE,GEN,SIM --magField 38T_PostLS1 --python_filename pythonLHEGEN_cfg.py --no_exec -n 100
 import FWCore.ParameterSet.Config as cms
 
@@ -53,7 +53,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM')
     ),
     SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring('GenFilter_step')
+        SelectEvents = cms.vstring('generation_step')
     )
 )
 
@@ -68,66 +68,10 @@ process.LHEoutput = cms.OutputModule("PoolOutputModule",
     )
 )
 
-
-
-# Andrej-CMS
-
-
-
-genParticleCollection = 'genParticles'
-genJetInputParticleCollection = genParticleCollection
-genJetCollection = 'ak4GenJetsCustom'
-
-from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJetsNoNu
-process.genParticlesForJetsNoNu = genParticlesForJetsNoNu.clone(
-	src = genJetInputParticleCollection
-)
-
-## Produce own jets (re-clustering in miniAOD needed at present to avoid crash)
-from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
-process.ak4GenJetsCustom = ak4GenJets.clone(
-    src = 'genParticlesForJetsNoNu',
-    rParam = cms.double(0.4),
-    jetAlgorithm = cms.string("AntiKt")
-)
-
-## Ghost particle collection used for Hadron-Jet association
-# MUST use proper input particle collection
-from PhysicsTools.JetMCAlgos.HadronAndPartonSelector_cfi import selectedHadronsAndPartons
-process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
-    particles = genParticleCollection,
-)
-
-from PhysicsTools.JetMCAlgos.AK4PFJetsMCFlavourInfos_cfi import ak4JetFlavourInfos
-process.genJetFlavourInfos = ak4JetFlavourInfos.clone(
-    jets = genJetCollection,
-)
-
-from PhysicsTools.JetMCAlgos.GenHFHadronMatcher_cff import matchGenBHadron
-process.matchGenBHadron = matchGenBHadron.clone(
-    genParticles = genParticleCollection,
-    jetFlavourInfos = "genJetFlavourInfos",
-    onlyJetClusteredHadrons = cms.bool(False)
-)
-
-from PhysicsTools.JetMCAlgos.ttHFGenFilter_cfi import ttHFGenFilter
-process.ttHFGenFilter = ttHFGenFilter.clone(
-    genParticles = genParticleCollection
-)
-
-
-
-
-
-
-
-# Andrej-CMS
-
-
 # Additional output definition
 
 # Other statements
-process.genstepfilter.triggerConditions=cms.vstring("GenFilter_step")
+process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_71_V1::All', '')
 
@@ -138,46 +82,46 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
     comEnergy = cms.double(13000.0),
     maxEventsToPrint = cms.untracked.int32(1),
     PythiaParameters = cms.PSet(
-        pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2',
-            'Main:timesAllowErrors = 10000',
-            'Check:epTolErr = 0.01',
-            'Beams:setProductionScalesFromLHEF = off',
-            'SLHA:keepSM = on',
-            'SLHA:minMassSM = 1000.',
-            'ParticleDecays:limitTau0 = on',
-            'ParticleDecays:tau0Max = 10',
+        pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2', 
+            'Main:timesAllowErrors = 10000', 
+            'Check:epTolErr = 0.01', 
+            'Beams:setProductionScalesFromLHEF = off', 
+            'SLHA:keepSM = on', 
+            'SLHA:minMassSM = 1000.', 
+            'ParticleDecays:limitTau0 = on', 
+            'ParticleDecays:tau0Max = 10', 
             'ParticleDecays:allowPhotonRadiation = on'),
-        pythia8PowhegEmissionVetoSettings = cms.vstring('POWHEG:veto = 1',
-            'POWHEG:pTdef = 1',
-            'POWHEG:emitted = 0',
-            'POWHEG:pTemt = 0',
-            'POWHEG:pThard = 0',
-            'POWHEG:vetoCount = 100',
-            'SpaceShower:pTmaxMatch = 2',
+        pythia8PowhegEmissionVetoSettings = cms.vstring('POWHEG:veto = 1', 
+            'POWHEG:pTdef = 1', 
+            'POWHEG:emitted = 0', 
+            'POWHEG:pTemt = 0', 
+            'POWHEG:pThard = 0', 
+            'POWHEG:vetoCount = 100', 
+            'SpaceShower:pTmaxMatch = 2', 
             'TimeShower:pTmaxMatch = 2'),
-        processParameters = cms.vstring('POWHEG:nFinal = 2',
-            'TimeShower:mMaxGamma = 1.0',
-            'Tune:pp 14',
-            'Tune:ee 7',
-            'MultipartonInteractions:ecmPow=0.25208',
-            'SpaceShower:alphaSvalue=0.1108',
-            'PDF:pSet=LHAPDF6:NNPDF30_lo_as_0130',
-            'MultipartonInteractions:pT0Ref=2.034340e+00',
-            'MultipartonInteractions:expPow=1.932600e+00',
+        processParameters = cms.vstring('POWHEG:nFinal = 2', 
+            'TimeShower:mMaxGamma = 1.0', 
+            'Tune:pp 14', 
+            'Tune:ee 7', 
+            'MultipartonInteractions:ecmPow=0.25208', 
+            'SpaceShower:alphaSvalue=0.1108', 
+            'PDF:pSet=LHAPDF6:NNPDF30_lo_as_0130', 
+            'MultipartonInteractions:pT0Ref=2.034340e+00', 
+            'MultipartonInteractions:expPow=1.932600e+00', 
             'ColourReconnection:range=5.706919e+00'),
-        parameterSets = cms.vstring('pythia8CommonSettings',
-            'pythia8PowhegEmissionVetoSettings',
+        parameterSets = cms.vstring('pythia8CommonSettings', 
+            'pythia8PowhegEmissionVetoSettings', 
             'processParameters')
     )
 )
 
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
-    nEvents = cms.untracked.uint32(100),
+    nEvents = cms.untracked.uint32(#NUMBEREVENTS#),
     outputFile = cms.string('cmsgrid_final.lhe'),
-    scriptName = cms.FileInPath('run_generic_tarball_cvmfs_modified.sh'),
+    scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh'),
     numberOfParameters = cms.uint32(1),
-    args = cms.vstring('gridpack.tgz')
+    args = cms.vstring('#GRIDPACKLOCATION#')
 )
 
 
@@ -192,7 +136,6 @@ randSvc.populate()
 # Path and EndPath definitions
 process.lhe_step = cms.Path(process.externalLHEProducer)
 process.generation_step = cms.Path(process.pgen)
-process.GenFilter_step = cms.Path(process.selectedHadronsAndPartons*process.genParticlesForJetsNoNu*process.ak4GenJetsCustom*process.genJetFlavourInfos*process.matchGenBHadron*process.ttHFGenFilter)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
@@ -200,22 +143,23 @@ process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 process.LHEoutput_step = cms.EndPath(process.LHEoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.GenFilter_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
+#process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
+process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step)
 # filter all path with the production filter sequence
 for path in process.paths:
 	if path in ['lhe_step']: continue
-	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq
+	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq 
 
 # customisation of the process.
 
 # Automatic addition of the customisation function from Configuration.DataProcessing.Utils
-from Configuration.DataProcessing.Utils import addMonitoring
+from Configuration.DataProcessing.Utils import addMonitoring 
 
 #call to customisation function addMonitoring imported from Configuration.DataProcessing.Utils
 process = addMonitoring(process)
 
 # Automatic addition of the customisation function from SLHCUpgradeSimulations.Configuration.postLS1Customs
-from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
+from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1 
 
 #call to customisation function customisePostLS1 imported from SLHCUpgradeSimulations.Configuration.postLS1Customs
 process = customisePostLS1(process)

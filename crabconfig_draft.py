@@ -8,16 +8,15 @@ config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'PrivateMC'
-config.JobType.psetName = 'pythonLHEGENFilter2_cfg.py'
-config.JobType.inputFiles = ["run_generic_tarball_cvmfs_modified.sh"]
+config.JobType.psetName = 'pythonLHEGEN_cfg.py'
+config.JobType.inputFiles = ['GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh', 'gridpack.tgz']
 config.JobType.disableAutomaticOutputCollection = False
-config.JobType.outputFiles = ["eventLHEGEN-output_inLHE.root","eventLHEGEN-output.root"]
 
 config.section_("Data")
-config.Data.outputPrimaryDataset = 'privateMCProductionLHEGEN'
+config.Data.outputPrimaryDataset = 'privateMCProductionLHEGEN_Filtered_TTbb_PowPyt'
 config.Data.splitting = 'EventBased'
-config.Data.unitsPerJob = 5
-config.Data.totalUnits = 5
+config.Data.unitsPerJob = 1200
+config.Data.totalUnits = #NUMBEREVENTS#
 config.Data.publication = False
 config.Data.outputDatasetTag = 'eventLHEGEN'
 

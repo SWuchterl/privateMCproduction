@@ -37,7 +37,7 @@ process.options = cms.untracked.PSet(
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.19 $'),
-    annotation = cms.untracked.string('Configuration/GenProduction/python/pythonLHEGEN.py nevts:100'),
+    annotation = cms.untracked.string('Configuration/GenProduction/python/pythonLHEGEN.py nevts:#NUMBEREVENTS#'),
     name = cms.untracked.string('Applications')
 )
 
@@ -53,7 +53,7 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM')
     ),
     SelectEvents = cms.untracked.PSet(
-        SelectEvents = cms.vstring('generation_step')
+        SelectEvents = cms.vstring('GenFilter_step')
     )
 )
 
@@ -69,9 +69,61 @@ process.LHEoutput = cms.OutputModule("PoolOutputModule",
 )
 
 # Additional output definition
+# Andrej-CMS
+
+
+
+genParticleCollection = 'genParticles'
+genJetInputParticleCollection = genParticleCollection
+genJetCollection = 'ak4GenJetsCustom'
+
+from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJetsNoNu
+process.genParticlesForJetsNoNu = genParticlesForJetsNoNu.clone(
+	src = genJetInputParticleCollection
+)
+
+## Produce own jets (re-clustering in miniAOD needed at present to avoid crash)
+from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
+process.ak4GenJetsCustom = ak4GenJets.clone(
+    src = 'genParticlesForJetsNoNu',
+    rParam = cms.double(0.4),
+    jetAlgorithm = cms.string("AntiKt")
+)
+
+## Ghost particle collection used for Hadron-Jet association
+# MUST use proper input particle collection
+from PhysicsTools.JetMCAlgos.HadronAndPartonSelector_cfi import selectedHadronsAndPartons
+process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
+    particles = genParticleCollection,
+)
+
+from PhysicsTools.JetMCAlgos.AK4PFJetsMCFlavourInfos_cfi import ak4JetFlavourInfos
+process.genJetFlavourInfos = ak4JetFlavourInfos.clone(
+    jets = genJetCollection,
+)
+
+from PhysicsTools.JetMCAlgos.GenHFHadronMatcher_cff import matchGenBHadron
+process.matchGenBHadron = matchGenBHadron.clone(
+    genParticles = genParticleCollection,
+    jetFlavourInfos = "genJetFlavourInfos",
+    onlyJetClusteredHadrons = cms.bool(False)
+)
+
+from PhysicsTools.JetMCAlgos.ttHFGenFilter_cfi import ttHFGenFilter
+process.ttHFGenFilter = ttHFGenFilter.clone(
+    genParticles = genParticleCollection
+)
+
+
+
+
+
+
+
+# Andrej-CMS
 
 # Other statements
-process.genstepfilter.triggerConditions=cms.vstring("generation_step")
+process.genstepfilter.triggerConditions=cms.vstring("GenFilter_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_71_V1::All', '')
 
@@ -117,11 +169,11 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
 
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
-    nEvents = cms.untracked.uint32(100),
+    nEvents = cms.untracked.uint32(#NUMBEREVENTS#),
     outputFile = cms.string('cmsgrid_final.lhe'),
-    scriptName = cms.FileInPath('run_generic_tarball_cvmfs_modified.sh'),
+    scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh'),
     numberOfParameters = cms.uint32(1),
-    args = cms.vstring('gridpack.tgz')
+    args = cms.vstring('#GRIDPACKLOCATION#')
 )
 
 
@@ -137,13 +189,15 @@ randSvc.populate()
 process.lhe_step = cms.Path(process.externalLHEProducer)
 process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
+process.GenFilter_step = cms.Path(process.selectedHadronsAndPartons*process.genParticlesForJetsNoNu*process.ak4GenJetsCustom*process.genJetFlavourInfos*process.matchGenBHadron*process.ttHFGenFilter)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 process.LHEoutput_step = cms.EndPath(process.LHEoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
+#process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
+process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.GenFilter_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step)
 # filter all path with the production filter sequence
 for path in process.paths:
 	if path in ['lhe_step']: continue
