@@ -22,6 +22,9 @@ process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+# import the GenFilter
+process.load('PhysicsTools.JetMCAlgos.GenHFHadronMatcher_cfi')
+process.load('PhysicsTools.JetMCAlgos.ttHFGenFilter_cfi')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(#NUMBEREVENTS#)
@@ -67,6 +70,7 @@ process.LHEoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('LHE')
     )
 )
+
 
 # Additional output definition
 
@@ -124,6 +128,47 @@ process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring('gridpack.tgz')
 )
 
+genParticleCollection = 'genParticles'
+genJetInputParticleCollection = genParticleCollection
+genJetCollection = 'ak4GenJetsCustom'
+
+from RecoJets.Configuration.GenJetParticles_cff import genParticlesForJetsNoNu
+process.genParticlesForJetsNoNu = genParticlesForJetsNoNu.clone(
+	src = genJetInputParticleCollection
+)
+
+## Produce own jets (re-clustering in miniAOD needed at present to avoid crash)
+from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
+process.ak4GenJetsCustom = ak4GenJets.clone(
+    src = 'genParticlesForJetsNoNu',
+    rParam = cms.double(0.4),
+    jetAlgorithm = cms.string("AntiKt")
+)
+
+## Ghost particle collection used for Hadron-Jet association
+# MUST use proper input particle collection
+from PhysicsTools.JetMCAlgos.HadronAndPartonSelector_cfi import selectedHadronsAndPartons
+process.selectedHadronsAndPartons = selectedHadronsAndPartons.clone(
+    particles = genParticleCollection,
+)
+
+from PhysicsTools.JetMCAlgos.AK4PFJetsMCFlavourInfos_cfi import ak4JetFlavourInfos
+process.genJetFlavourInfos = ak4JetFlavourInfos.clone(
+    jets = genJetCollection,
+)
+
+from PhysicsTools.JetMCAlgos.GenHFHadronMatcher_cff import matchGenBHadron
+process.matchGenBHadron = matchGenBHadron.clone(
+    genParticles = genParticleCollection,
+    jetFlavourInfos = "genJetFlavourInfos",
+    onlyJetClusteredHadrons = cms.bool(False)
+)
+
+from PhysicsTools.JetMCAlgos.ttHFGenFilter_cfi import ttHFGenFilter
+process.ttHFGenFilter = ttHFGenFilter.clone(
+    genParticles = genParticleCollection
+)
+
 
 process.ProductionFilterSequence = cms.Sequence(process.generator)
 
@@ -133,17 +178,36 @@ randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
 randSvc.populate()
 
 
+#filter process
+
+process.Filter = cms.OutputModule("PoolOutputModule",
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('BestFilterInTheWorld')
+    ),
+    fileName = cms.untracked.string('file:eventLHEGEN-output_Filtered.root')
+)
+
+process.BestFilterInTheWorld = cms.Sequence(
+    process.selectedHadronsAndPartons
+    *process.genParticlesForJetsNoNu
+    *process.ak4GenJetsCustom
+    *process.genJetFlavourInfos
+    *process.matchGenBHadron
+    *process.ttHFGenFilter
+)
+
 # Path and EndPath definitions
 process.lhe_step = cms.Path(process.externalLHEProducer)
 process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
+process.GenFilter_Step = cms.EndPath(process.BestFilterInTheWorld)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.RAWSIMoutput_step = cms.EndPath(process.RAWSIMoutput)
 process.LHEoutput_step = cms.EndPath(process.LHEoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
+process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.GenFilter_Step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.RAWSIMoutput_step,process.LHEoutput_step)
 # filter all path with the production filter sequence
 for path in process.paths:
 	if path in ['lhe_step']: continue
