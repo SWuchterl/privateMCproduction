@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define number of events
-export NUMBEREVENTS=400000
+export NUMBEREVENTS=1100000
 
 # Define workdir
 export WORKDIR=/nfs/dust/cms/user/mharrend/trancheprivateproduction/test3

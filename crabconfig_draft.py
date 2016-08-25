@@ -15,13 +15,14 @@ config.JobType.disableAutomaticOutputCollection = False
 config.section_("Data")
 config.Data.outputPrimaryDataset = 'privateMCProductionLHEGEN'
 config.Data.splitting = 'EventBased'
-config.Data.unitsPerJob = 1200
+config.Data.unitsPerJob = 1100
 config.Data.totalUnits = #NUMBEREVENTS#
 config.Data.publication = False
 config.Data.outputDatasetTag = 'eventLHEGEN'
 
 config.section_("Site")
 config.Site.storageSite = 'T2_DE_DESY'
+config.Site.blacklist = ['T3_US_UMiss']
 
 config.section_("User")
 config.User.voGroup = "dcms"
