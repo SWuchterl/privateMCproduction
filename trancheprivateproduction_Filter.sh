@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define number of events
-export NUMBEREVENTS=600000
+export NUMBEREVENTS=400000
 
 # Define workdir
-export WORKDIR=/nfs/dust/cms/user/asaibel/MCProductionScripts/privateMCproduction
+export WORKDIR=/nfs/dust/cms/user/asaibel/privateMCproduction
 
 # Define gridpack location, warning if you are using crab, requires global accessible gridpack
 # If running locally you can also set a local gridpack location
