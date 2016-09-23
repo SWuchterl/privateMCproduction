@@ -14,7 +14,7 @@ config.JobType.disableAutomaticOutputCollection = False
 config.section_("Data")
 config.Data.outputPrimaryDataset = 'privateMCProductionAODSIM'
 config.Data.splitting = 'EventBased'
-config.Data.unitsPerJob = 1200
+config.Data.unitsPerJob = 1000
 config.Data.totalUnits = #NUMBEREVENTS#
 config.Data.publication = False
 config.Data.outputDatasetTag = 'eventAODSIM'
