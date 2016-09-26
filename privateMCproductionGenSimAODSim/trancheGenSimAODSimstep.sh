@@ -2,20 +2,20 @@
 
 
 # Define number of events
-export NUMBEREVENTS=100
+export NUMBEREVENTS=12000
 
 # Define workdir
 export WORKDIR=`pwd`
 
 # Define location of GenSim samples, warning make sure that you run only one time on the same folder since otherwise we will produce two times the events.
 # Furthermore, you have to give an absolute path name
-export GENSIMLOC=/pnfs/desy.de/cms/tier2/store/user/asaibel/privateMCProductionLHEGEN_Filtered_TTbb_PowPyt/eventLHEGEN/160823_073536
+export GENSIMLOC=/pnfs/desy.de/cms/tier2/store/user/husemann/privateMCProductionLHEGEN/eventLHEGEN/160822_162317
 #export GENSIMLOC=/pnfs/desy.de/cms/tier2/store/user/husemann/privateMCProductionLHEGEN/eventLHEGEN/160826_060732
 # export GRIDPACKLOC=/afs/cern.ch/work/m/mharrend/public/ttHtranche3/TTTo2L2Nu_hvq_ttHtranche3.tgz
 
 # Use crab for grid submitting, adjust crabconfig.py accordingly beforehand
 #export USECRAB="True" Does not work yet, needs some adjustments
-export USECRAB="False"
+export USECRAB="True"
 
 ######### Do not change anything behind this line ###############
 
@@ -82,7 +82,7 @@ if [ $USECRAB = "True" ]; then
         scram b -j 4
 
 	echo "Submit crab jobs"
-	#crab submit crabconfig.py
+	crab submit crabconfig.py
 
 	echo "Finished with crab submission, check job status manually"
 else

@@ -33,7 +33,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 # MAH: Uses tuple to have more than 255 input files
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring((#INPUTFILES#)),
+    fileNames = cms.untracked.vstring(*(#INPUTFILES#)),
     secondaryFileNames = cms.untracked.vstring()
 )
 
