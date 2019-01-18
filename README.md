@@ -41,21 +41,22 @@ Table of Contents
 ## Recipe for LHEGENSIM level production
 
 ### Overview
- * This recipe will produce GenSim level events from a POWHEG gridpack using the same configuration as in the official CMSSW 2016 tranche3 production.
+ * This recipe will produce GenSim level events from a POWHEG gridpack using the same configuration as in the official CMSSW production
 
 ### Recipe
 1. Clone this repository to any folder
-1. Open the trancheprivateproduction.sh script contained in the folder
-1. Adjust the first four parameters until "Do not change anything
-behind this line" according to your local setup.
-  1. NUMBEREVENTS: Defines how many events you want to produce
-  1. WORKDIR: Defines in which directory CMSSW installation is set up and where in local production events are stored
-  1. GRIDPACKLOC: Defines which gridpack is used, you can choose the Powheg ttbar, semileptonic decay or Powheg ttbar, dileptonic decay gridpack. 
-  1. USECRAB: False means local production, True results in crab submission
-1. Additional step for crab submission: Check and modify crabconfig_draft.py script:
-  1. config.Site.storageSite: Set your grid storage site, e.g. 'T2_DE_DESY' for german users
-  1. config.User.voGroup: If you a non-german user, you should comment out this section.
-1. Start the production via ./trancheprivateproduction.sh
+1. Setup a CMSSW environment version that you want to use for production
+   1. e.g. CMSSW_1_30_X, CMSSW_9_3_X, CMSSW_9_4_X, CMSSW_10_2_X
+1. Create (download) a python configuration file for cmsRun 
+   1. you can make one from the test command on McM or create one from a fragment with cmsDriver command
+   1. this config file also contains the link to the gridpack to use. Needs to be accessable from the grid
+1. Have a look at "crabconfig_GENSIM.py" in this repo
+   1. this is an example file for crab configuration
+   1. change outputPrimaryDataset , outputDatasetTag, unitsPerJob, totalUnits, storageSite
+   1. "psetName" is the name of the cmsRun python config file to be found in the same folder as the crabconfig
+1. do: crab submit crabconfig_GENSIM.py
+1. "crab status" to check the status of the submission
+1. crab resubmit <workArea/requestName> if jobs fail due to memory,time issues
 
 ### Notes
 * The current settings are optimized for a grid submission during which you should produce roughly 400k events per day.
