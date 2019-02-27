@@ -33,9 +33,9 @@ config.section_("Site")
 #site where you have your t2 account and grid storage
 config.Site.storageSite = 'T2_DE_DESY'
 #configure which sites to run on
-config.Site.whitelist = ['T2_*']
+config.Site.whitelist = ['T2_DE_DESY']
 
 config.section_("User")
 ## only german users
-#config.User.voGroup = "dcms"
+config.User.voGroup = "dcms"
 
