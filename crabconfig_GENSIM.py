@@ -9,7 +9,7 @@ config.General.transferLogs = True
 config.section_("JobType")
 config.JobType.pluginName = 'PrivateMC'
 #name of the python cmsRun config to run
-config.JobType.psetName = 'HIG-RunIIFall17GS-00148_1_cfg.py'
+config.JobType.psetName = 'TTbb_PowhegOpenloops_Pythia8Config.py'
 #config.JobType.inputFiles = ['GeneratorInterface/GenFilters/src/TopDecayFilter.cc', 'GeneratorInterface/GenFilters/python/TopDecayFilter_cfi.py','GeneratorInterface/GenFilters/python/interface/TopDecayFilter.h']
 config.JobType.disableAutomaticOutputCollection = False
 #settings below should be enough for 1000 events per job. would advice 800-1000 events per job (jobs will fail if you use too many)
@@ -26,16 +26,16 @@ config.Data.totalUnits = 15000000
 #publication on das under prod/phys03.
 config.Data.publication = True
 #second part of the sample name
-config.Data.outputDatasetTag = 'TTbbtoSemileptonic_TuneCP5_PSweights_13TeV-powheg-openloops-pythia8-Fall17GS-v2'
+config.Data.outputDatasetTag = 'TTbbtoSemileptonic_TuneCP5_PSweights_13TeV-powheg-openloops-pythia8-Fall17GS'
 
 
 config.section_("Site")
 #site where you have your t2 account and grid storage
 config.Site.storageSite = 'T2_DE_DESY'
 #configure which sites to run on
-config.Site.whitelist = ['T2_*']
+config.Site.whitelist = ['T2_DE_DESY']
 
 config.section_("User")
 ## only german users
-#config.User.voGroup = "dcms"
+config.User.voGroup = "dcms"
 
