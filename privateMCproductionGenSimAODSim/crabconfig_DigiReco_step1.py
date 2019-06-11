@@ -12,6 +12,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'TTbar_Powloops_2017_DigiReco_1_cfg.py'
 config.JobType.disableAutomaticOutputCollection = False
 config.JobType.maxMemoryMB = 2500
+config.JobType.maxJobRuntimeMin = 1440
 
 config.section_("Data")
 #config.Data.outputPrimaryDataset = 'RelValJetFlavourMiniAOD'
