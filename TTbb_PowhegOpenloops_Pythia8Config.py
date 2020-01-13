@@ -1,7 +1,7 @@
 # Auto generated configuration file
-# using: 
-# Revision: 1.19 
-# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
+# using:
+# Revision: 1.19
+# Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
 # with command line options: Configuration/GenProduction/python/HIG-RunIIFall17GS-00148-fragment.py --fileout file:HIG-RunIIFall17GS-00148.root --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions 93X_mc2017_realistic_v3 --beamspot Realistic25ns13TeVEarly2017Collision --step GEN,SIM --nThreads 4 --geometry DB:Extended --era Run2_2017 --python_filename HIG-RunIIFall17GS-00148_1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 833
 import FWCore.ParameterSet.Config as cms
 
@@ -26,13 +26,14 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(750)
 )
 
-# Input source                                                                                                                                                                                              
+# Input source
 process.source = cms.Source("LHESource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/user/asaibel/ttbb_Powloops/LHE/Semileptonic/Powheg_Openloops_ttbb.lhe"),
+    # fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/user/asaibel/ttbb_Powloops/LHE/Semileptonic/Powheg_Openloops_ttbb.lhe"),
+    fileNames = cms.untracked.vstring("root://cms-xrd-global.cern.ch//store/user/sewuchte/ttJProduction/v0/LHE_Input/out.lhe"),
     inputCommands = cms.untracked.vstring('keep *',
         'drop LHEXMLStringProduct_*_*_*'),
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
@@ -63,7 +64,8 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(20971520),
-    fileName = cms.untracked.string('file:TTBB_PowhegOpenloops.root'),
+    # fileName = cms.untracked.string('file:TTBB_PowhegOpenloops.root'),
+    fileName = cms.untracked.string('file:TTPlus1J_Powheg.root'),
     outputCommands = process.RAWSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -78,55 +80,55 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '93X_mc2017_realistic_v3', '')
 
 process.generator = cms.EDFilter("Pythia8HadronizerFilter",
     PythiaParameters = cms.PSet(
-        parameterSets = cms.vstring('pythia8CommonSettings', 
-            'pythia8CP5Settings', 
-            'pythia8PowhegEmissionVetoSettings', 
+        parameterSets = cms.vstring('pythia8CommonSettings',
+            'pythia8CP5Settings',
+            'pythia8PowhegEmissionVetoSettings',
             'processParameters'),
-        processParameters = cms.vstring('POWHEG:nFinal = 4', 
-            'TimeShower:mMaxGamma = 1.0', 
-            '6:m0 = 172.5', 
-            '5:m0 = 4.75', 
-            'UncertaintyBands:doVariations = on', 
-            'UncertaintyBands:List = {isrRedHi isr:muRfac=0.707,fsrRedHi fsr:muRfac=0.707,isrRedLo isr:muRfac=1.414,fsrRedLo fsr:muRfac=1.414,isrDefHi isr:muRfac=0.5, fsrDefHi fsr:muRfac=0.5,isrDefLo isr:muRfac=2.0,fsrDefLo fsr:muRfac=2.0,isrConHi isr:muRfac=0.25, fsrConHi fsr:muRfac=0.25,isrConLo isr:muRfac=4.0,fsrConLo fsr:muRfac=4.0}', 
-            'UncertaintyBands:MPIshowers = on', 
-            'UncertaintyBands:overSampleFSR = 10.0', 
-            'UncertaintyBands:overSampleISR = 10.0', 
-            'UncertaintyBands:FSRpTmin2Fac = 20', 
+        processParameters = cms.vstring('POWHEG:nFinal = 3',
+            'TimeShower:mMaxGamma = 1.0',
+            '6:m0 = 172.5',
+            '5:m0 = 4.75',
+            'UncertaintyBands:doVariations = on',
+            'UncertaintyBands:List = {isrRedHi isr:muRfac=0.707,fsrRedHi fsr:muRfac=0.707,isrRedLo isr:muRfac=1.414,fsrRedLo fsr:muRfac=1.414,isrDefHi isr:muRfac=0.5, fsrDefHi fsr:muRfac=0.5,isrDefLo isr:muRfac=2.0,fsrDefLo fsr:muRfac=2.0,isrConHi isr:muRfac=0.25, fsrConHi fsr:muRfac=0.25,isrConLo isr:muRfac=4.0,fsrConLo fsr:muRfac=4.0}',
+            'UncertaintyBands:MPIshowers = on',
+            'UncertaintyBands:overSampleFSR = 10.0',
+            'UncertaintyBands:overSampleISR = 10.0',
+            'UncertaintyBands:FSRpTmin2Fac = 20',
             'UncertaintyBands:ISRpTmin2Fac = 1'),
-        pythia8CP5Settings = cms.vstring('Tune:pp 14', 
-            'Tune:ee 7', 
-            'MultipartonInteractions:ecmPow=0.03344', 
-            'PDF:pSet=20', 
-            'MultipartonInteractions:bProfile=2', 
-            'MultipartonInteractions:pT0Ref=1.41', 
-            'MultipartonInteractions:coreRadius=0.7634', 
-            'MultipartonInteractions:coreFraction=0.63', 
-            'ColourReconnection:range=5.176', 
-            'SigmaTotal:zeroAXB=off', 
-            'SpaceShower:alphaSorder=2', 
-            'SpaceShower:alphaSvalue=0.118', 
-            'SigmaProcess:alphaSvalue=0.118', 
-            'SigmaProcess:alphaSorder=2', 
-            'MultipartonInteractions:alphaSvalue=0.118', 
-            'MultipartonInteractions:alphaSorder=2', 
-            'TimeShower:alphaSorder=2', 
+        pythia8CP5Settings = cms.vstring('Tune:pp 14',
+            'Tune:ee 7',
+            'MultipartonInteractions:ecmPow=0.03344',
+            'PDF:pSet=20',
+            'MultipartonInteractions:bProfile=2',
+            'MultipartonInteractions:pT0Ref=1.41',
+            'MultipartonInteractions:coreRadius=0.7634',
+            'MultipartonInteractions:coreFraction=0.63',
+            'ColourReconnection:range=5.176',
+            'SigmaTotal:zeroAXB=off',
+            'SpaceShower:alphaSorder=2',
+            'SpaceShower:alphaSvalue=0.118',
+            'SigmaProcess:alphaSvalue=0.118',
+            'SigmaProcess:alphaSorder=2',
+            'MultipartonInteractions:alphaSvalue=0.118',
+            'MultipartonInteractions:alphaSorder=2',
+            'TimeShower:alphaSorder=2',
             'TimeShower:alphaSvalue=0.118'),
-        pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2', 
-            'Main:timesAllowErrors = 10000', 
-            'Check:epTolErr = 0.01', 
-            'Beams:setProductionScalesFromLHEF = off', 
-            'SLHA:keepSM = on', 
-            'SLHA:minMassSM = 1000.', 
-            'ParticleDecays:limitTau0 = on', 
-            'ParticleDecays:tau0Max = 10', 
+        pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2',
+            'Main:timesAllowErrors = 10000',
+            'Check:epTolErr = 0.01',
+            'Beams:setProductionScalesFromLHEF = off',
+            'SLHA:keepSM = on',
+            'SLHA:minMassSM = 1000.',
+            'ParticleDecays:limitTau0 = on',
+            'ParticleDecays:tau0Max = 10',
             'ParticleDecays:allowPhotonRadiation = on'),
-        pythia8PowhegEmissionVetoSettings = cms.vstring('POWHEG:veto = 1', 
-            'POWHEG:pTdef = 1', 
-            'POWHEG:emitted = 0', 
-            'POWHEG:pTemt = 0', 
-            'POWHEG:pThard = 0', 
-            'POWHEG:vetoCount = 100', 
-            'SpaceShower:pTmaxMatch = 2', 
+        pythia8PowhegEmissionVetoSettings = cms.vstring('POWHEG:veto = 1',
+            'POWHEG:pTdef = 1',
+            'POWHEG:emitted = 0',
+            'POWHEG:pTemt = 0',
+            'POWHEG:pThard = 0',
+            'POWHEG:vetoCount = 100',
+            'SpaceShower:pTmaxMatch = 2',
             'TimeShower:pTmaxMatch = 2')
     ),
     comEnergy = cms.double(13000.0),
@@ -156,12 +158,12 @@ process.options.numberOfThreads=cms.untracked.uint32(1)
 process.options.numberOfStreams=cms.untracked.uint32(0)
 # filter all path with the production filter sequence
 for path in process.paths:
-	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq 
+	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq
 
 # customisation of the process.
 
 # Automatic addition of the customisation function from Configuration.DataProcessing.Utils
-from Configuration.DataProcessing.Utils import addMonitoring 
+from Configuration.DataProcessing.Utils import addMonitoring
 
 #call to customisation function addMonitoring imported from Configuration.DataProcessing.Utils
 process = addMonitoring(process)
